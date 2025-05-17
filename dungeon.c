@@ -334,8 +334,8 @@ if (mosquitto_connect(mosquitto_client, "localhost, 1883, 60") != MOSQ_ERR_SUCCE
     // Start in a random room
     currentRoom = rand() % 10;
 
-    printf("Welcome to the Dungeon!\n");
-    printf("Type 'H' for help, 'Q' to quit.\n");
+    SENDMSG("Welcome to the Dungeon!\n");
+    SENDMSG("Type 'H' for help, 'Q' to quit.\n");
     printRoomDescription(currentRoom);
 
     while (1)
