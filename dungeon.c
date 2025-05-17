@@ -9,6 +9,26 @@
 #define GRID_SIZE 4
 #define NUM_ROOMS 10
 #define NUM_DUNGEONS 4 // Number of dungeons
+#define TCP_PORT 4000
+#define BACKLOG 1 // Number of connections allowed (1 currently)
+#define BUFFER_SIZE 256
+
+int setup_listener(int port) {
+    int listen_descriptor = socket(AF_INET, SOCK_STREAM, 0);
+
+    if (listen_descriptor < 0) {
+        perror("socket");
+        exit(1);
+    }
+
+    int reuse_address = 1;
+
+    if (setsockopt(listen_descriptor, SOL_SOCKET, SO_REUSEADDR, &reuse_address, sizeof(reuse_address)) < 0) {
+        perror("setsocketopt");
+        close(listen_descriptor);
+        exit(1);
+    }
+}
 
 // Room structure definition
 typedef struct
