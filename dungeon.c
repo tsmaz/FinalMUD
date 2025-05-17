@@ -118,9 +118,12 @@ int findRoomByCoords(int x, int y)
     return -1;
 }
 
+// Sends the description of the current room to the connected client over MQTT, plus some server-side printing to console for vertification
+// MQTT payload should be handled and printed on the clientside after receiving.
 void printRoomDescription(int roomId)
 {
-    printf("\n%s\n", dungeons[currentDungeon][roomId].description);
+    char *description = dungeons[currentDungeon][roomID].description;
+    printf("\n%s\n", description);
     printf("Current Dungeon: %d\n", currentDungeon);
 
     if (dungeons[currentDungeon][roomId].isConnectorRoom &&
@@ -129,6 +132,12 @@ void printRoomDescription(int roomId)
         printf("This connector leads to Dungeon %d\n",
                dungeons[currentDungeon][roomId].connectedDungeon);
     }
+
+    int ret = mosquitto_publish(mosquitto_client, NULL, "game/room/description", strlen(description), description, 0, false);
+    if (ret != MOSQ_ERR_SUCCESS) {
+        fprintf(stderr, "Failed to publish message: %s\n", mosquitto_strerror(ret));
+    }
+    
 
 }
 
