@@ -24,7 +24,7 @@
 
 static struct mosquitto *mosquitto_client = NULL;
 
-#define GRID_SIZE 4
+#define GRID_SIZE 6
 #define NUM_ROOMS 10
 #define NUM_DUNGEONS 4 // Number of dungeons
 #define TCP_PORT 4000
@@ -130,19 +130,32 @@ Room dungeon2[10] = {
 
 // Third dungeon
 Room dungeon3[10] = {
-    {0, 1, 0, "You find yourself navigating an armory of sorts. Around you there are numerous weapons surrounding an archway to the East.", false, true, true, 1}, // Start room, connects to dungeon2
+    {0, 0, 1, "You find yourself navigating an armory of sorts. Around you there are numerous weapons surrounding an archway to the East.", false, true, true, 1}, // Start room, connects to dungeon2
     {1, 1, 1, "There are more weapons around you. A hallway continues to the East, and there is an open cage to the south.", false, false, false, -1},
-    {2, 0, 1, "You continue into the cage. It is simply a cage. The door is still open behind you, you know. You should, like, get out.", false, false, false, -1},
-    {3, 1, 2, "The barren hallway leads you towards the central room towards the North.", false, false, false, -1},
+    {2, 1, 0, "You continue into the cage. It is simply a cage. The door is still open behind you, you know. You should, like, get out.", false, false, false, -1},
+    {3, 2, 1, "The barren hallway leads you towards the central room towards the North.", false, false, false, -1},
     {4, 2, 2, "The central room has multiple hallways, one to the North and one to the East.", false, false, false, -1},
-    {5, 3, 2, "The northern hall is barren and gray, with curtains on all of the walls, making it difficult to see a path.", false, false, false, -1},
-    {6, 2, 3, "You continue out of the armory and into a new area.", false, true, false, 3}, // Connector room to dungeon 4
-    {7, 3, 1, "You push through a curtain and find yourself into a warm, furnished room. It's cozy here. You almost don't want to continue through the hallway to the North.", false, false, false, -1},
-    {8, 4, 1, "You continue through the scary hallway. Nothing to do except move forward. Or go back to the nice room behind you. You choose.", false, false, false, -1},
-    {9, 5, 1, "Finally, you find yourself in a lavish throne room with many riches. Congratulations, you made it!", true, false, false, -1}}; // Item Room
+    {5, 2, 3, "The northern hall is barren and gray, with curtains on all of the walls, making it difficult to see a path.", false, false, false, -1},
+    {6, 3, 2, "You continue out of the armory and into a new area.", false, true, false, 3}, // Connector room to dungeon 4
+    {7, 1, 3, "You push through a curtain and find yourself into a warm, furnished room. It's cozy here. You almost don't want to continue through the hallway to the North.", false, false, false, -1},
+    {8, 1, 4, "You continue through the scary hallway. Nothing to do except move forward. Or go back to the nice room behind you. You choose.", false, false, false, -1},
+    {9, 1, 5, "Finally, you find yourself in a lavish throne room with many riches. Congratulations, you made it!", true, false, false, -1}}; // Item Room
+
+// Fourth dungeon
+Room dungeon4[10] = {
+    {0, 0, 1, "You are in a room that is filled on almost all sides with chairs. The only way out is a room to the East.", false, true, true, 0}, // Start Room (near bottom left)
+    {1, 1, 1, "You are now at a split choice in a corridor made of metal. You can either move West to the room of chairs, move North through a door, or move South.", false, false, false, -1},
+    {2, 1, 0, "You are now in the south corner of the metal corridor. You can either move up North or move East to investigate the nearby room.", false, false, false, -1},
+    {3, 2, 0, "You are in a dark room. It's impossible to make anything out, so there's nowhere to go, except the door to the West.", false, false, false, -1},
+    {4, 1, 2, "You are in a room made entirely made of candy. Despite the temptations, you must choose to either move South to the metal corridor or move East through a door.", false, false, false, 2},
+    {5, 2, 2, "You are in a room that's made of creaky wood. The way East seems a bit unstable, but you could probably jump through the doorway. You could also choose to move to the West, which you can tell is safe.", false, false, false, -1},
+    {6, 3, 2, "You are in a room made of soft bedding. You can move through the gold door North of you, or investigate the heat in the room to the South.", false, false, false, -1},
+    {7, 3, 3, "You are in a room that appears to be made of gold... but it turns out to be a trick. The yellow-painted floor gives way, and you fall for a long time. Everything goes dark. When you regain consciousness...", false, true, false, -1}, // Connector room (top right)
+    {8, 3, 1, "You are in a room that's on fire. You can either brave the flames and move to the east, or flee to the chill of the North.", false, false, false, -1},
+    {9, 4, 1, "You are in a room made entirely of gold. There's a treasure chest at the end of the room. You look inside... Inside is a small golden chair. Maybe it's valuable...? THE END.", true, false, false, -1}}; //Item room (near bottom right)
 
 // Array of dungeon pointers for easy access
-Room *dungeons[NUM_DUNGEONS] = {dungeon1, dungeon2, dungeon3, NULL};
+Room *dungeons[NUM_DUNGEONS] = {dungeon1, dungeon2, dungeon3, dungeon4};
 
 
 int currentRoom = 0;
