@@ -6,7 +6,8 @@
 // Wi-Fi and MQTT configuration - CHANGE THESE
 const char* ssid = "Airplow";
 const char* password = "tonytony";
-const char* mqtt_server = "34.102.16.54";
+const char* host_ip = "34.102.16.54";
+WiFiClient sock; 
 
 // LCD setup
 LiquidCrystal_I2C lcd(0x27, 16, 2);
@@ -40,13 +41,12 @@ void callback(char* topic, byte* payload, unsigned int length) {
     for (unsigned int i = 0; i < length; i++) {
       message += (char)payload[i];
     }
-    scrollText(description);
+    scrollText(message);
   }
 }
 
 void sendMove(char direction) {
-  String dirStr(1, direction);
-  client.publish("game/player/move", dirStr.c_str());
+  sock.write(direction);
 }
 
 void reconnect() {
@@ -81,8 +81,10 @@ void setup() {
   Serial.print("IP Address: ");
   Serial.println(WiFi.localIP());
 
-  client.setServer(mqtt_server, 1883);
+  client.setServer(host_ip, 1883);
   client.setCallback(callback);
+
+  sock.connect(host_ip, 4000);
 
   Wire.begin(14, 13); // Adjust pins if necessary
   lcd.init();
