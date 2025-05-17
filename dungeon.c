@@ -15,6 +15,19 @@ static struct mosquitto *mosquitto_client = NULL;
 #define TCP_PORT 4000
 #define BACKLOG 1 // Number of connections allowed (1 currently)
 #define BUFFER_SIZE 256
+#define COMMAND_BUFFER_SIZE 128
+
+static void cleanup_input(char *input) {
+    char *stripped = input + strlen(s);
+
+    while (stripped > input && (*(stripped - 1) =='\n' || *(stripped - 1)=='\r')) {
+        *--stripped = '\0';
+    }
+
+    for (char *upper = input; *upper; ++upper) {
+        *upper = toupper((unsigned char)*upper);
+    }
+}
 
 int setup_listener(int port) {
     int listen_descriptor = socket(AF_INET, SOCK_STREAM, 0);
