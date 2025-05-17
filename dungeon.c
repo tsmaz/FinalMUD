@@ -233,6 +233,7 @@ int movePlayer(char direction)
     }
 
     printf("Cannot move in that direction - no room there!\n");
+    SENDMSG("Cannot move in that direction - no room there!");
     return 0;
 }
 
@@ -292,13 +293,13 @@ void handle_incoming_command(int client_descriptor) {
         if (strcmp(buffer, "N") == 0 || strcmp(buffer, "S") == 0 || strcmp(buffer, "E") == 0 || strcmp(buffer, "W") == 0) {
             char direction;
 
-            if (strcmp(buffer, "NORTH")==0) {
+            if (strcmp(buffer, "S")== 0) {
                 direction = 'n';
             }
-            else if (strcmp(buffer, "SOUTH")==0) {
+            else if (strcmp(buffer, "E")== 0) {
                 direction = 's';
             } 
-            else if (strcmp(buffer, "EAST" )==0) {
+            else if (strcmp(buffer, "W" )== 0) {
                 direction = 'e';
             }
             else {
