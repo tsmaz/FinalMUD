@@ -125,8 +125,21 @@ Room dungeon3[10] = {
     {8, 4, 1, "You continue through the scary hallway. Nothing to do except move forward. Or go back to the nice room behind you. You choose.", false, false, false, -1},
     {9, 5, 1, "Finally, you find yourself in a lavish throne room with many riches. Congratulations, you made it!", true, false, false, -1}}; // Item Room
 
+// Fourth dungeon
+Room dungeon4[10] = {
+    {0, 0, 1, "You are at coordinates (0,1)", false, true, true, 0}, // Start Room (near bottom left)
+    {1, 1, 1, "You are at coordinates (1,1)", false, false, false, -1},
+    {2, 1, 0, "You are at coordinates (1,0)", false, false, false, -1},
+    {3, 2, 0, "You are at coordinates (2,0)", false, false, false, -1},
+    {4, 1, 2, "You are at coordinates (3,0)", false, false, false, 2},
+    {5, 2, 2, "You are at coordinates (2,2)", false, false, false, -1},
+    {6, 3, 2, "You are at coordinates (0,1)", false, false, false, -1},
+    {7, 3, 3, "You are at coordinates (1,1)", false, true, false, -1}, // Connector room (top right)
+    {8, 3, 1, "You are at coordinates (2,1)", false, false, false, -1},
+    {9, 4, 1, "You are at coordinates (3,1)", true, false, false, -1}}; //Item room (near bottom right)
+
 // Array of dungeon pointers for easy access
-Room *dungeons[NUM_DUNGEONS] = {dungeon1, dungeon2, dungeon3, NULL};
+Room *dungeons[NUM_DUNGEONS] = {dungeon1, dungeon2, dungeon3, dungeon4};
 
 
 int currentRoom = 0;
