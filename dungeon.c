@@ -129,16 +129,16 @@ Room dungeon2[10] = {
 
 // Third dungeon
 Room dungeon3[10] = {
-    {0, 1, 0, "You find yourself navigating an armory of sorts. Around you there are numerous weapons surrounding an archway to the East.", false, true, true, 1}, // Start room, connects to dungeon2
+    {0, 0, 1, "You find yourself navigating an armory of sorts. Around you there are numerous weapons surrounding an archway to the East.", false, true, true, 1}, // Start room, connects to dungeon2
     {1, 1, 1, "There are more weapons around you. A hallway continues to the East, and there is an open cage to the south.", false, false, false, -1},
-    {2, 0, 1, "You continue into the cage. It is simply a cage. The door is still open behind you, you know. You should, like, get out.", false, false, false, -1},
-    {3, 1, 2, "The barren hallway leads you towards the central room towards the North.", false, false, false, -1},
+    {2, 1, 0, "You continue into the cage. It is simply a cage. The door is still open behind you, you know. You should, like, get out.", false, false, false, -1},
+    {3, 2, 1, "The barren hallway leads you towards the central room towards the North.", false, false, false, -1},
     {4, 2, 2, "The central room has multiple hallways, one to the North and one to the East.", false, false, false, -1},
-    {5, 3, 2, "The northern hall is barren and gray, with curtains on all of the walls, making it difficult to see a path.", false, false, false, -1},
-    {6, 2, 3, "You continue out of the armory and into a new area.", false, true, false, 3}, // Connector room to dungeon 4
-    {7, 3, 1, "You push through a curtain and find yourself into a warm, furnished room. It's cozy here. You almost don't want to continue through the hallway to the North.", false, false, false, -1},
-    {8, 4, 1, "You continue through the scary hallway. Nothing to do except move forward. Or go back to the nice room behind you. You choose.", false, false, false, -1},
-    {9, 5, 1, "Finally, you find yourself in a lavish throne room with many riches. Congratulations, you made it!", true, false, false, -1}}; // Item Room
+    {5, 2, 3, "The northern hall is barren and gray, with curtains on all of the walls, making it difficult to see a path.", false, false, false, -1},
+    {6, 3, 2, "You continue out of the armory and into a new area.", false, true, false, 3}, // Connector room to dungeon 4
+    {7, 1, 3, "You push through a curtain and find yourself into a warm, furnished room. It's cozy here. You almost don't want to continue through the hallway to the North.", false, false, false, -1},
+    {8, 1, 4, "You continue through the scary hallway. Nothing to do except move forward. Or go back to the nice room behind you. You choose.", false, false, false, -1},
+    {9, 1, 5, "Finally, you find yourself in a lavish throne room with many riches. Congratulations, you made it!", true, false, false, -1}}; // Item Room
 
 // Fourth dungeon
 Room dungeon4[10] = {
