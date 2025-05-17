@@ -4,9 +4,9 @@
 #include <Wire.h>
 
 // Wi-Fi and MQTT configuration - CHANGE THESE
-const char* ssid = "YOUR-SSID";
-const char* password = "WIFI-PASSWORD";
-const char* mqtt_server = "MQTT-SERVER";
+const char* ssid = "Airplow";
+const char* password = "tonytony";
+const char* mqtt_server = "34.102.16.54";
 
 // LCD setup
 LiquidCrystal_I2C lcd(0x27, 16, 2);
@@ -31,6 +31,14 @@ void callback(char* topic, byte* payload, unsigned int length) {
     String description = "";
     for (unsigned int i = 0; i < length; i++) {
       description += (char)payload[i];
+    }
+    scrollText(description);
+  }
+
+  if (strcmp(topic, "game/message/serverToClient") == 0) {
+     String message = "";
+    for (unsigned int i = 0; i < length; i++) {
+      message += (char)payload[i];
     }
     scrollText(description);
   }

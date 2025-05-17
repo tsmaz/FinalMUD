@@ -1,11 +1,26 @@
+#if defined(_WIN32) || defined(_WIN64)
+#include <winsock2.h>
+#include <ws2tcpip.h>
+
+#else
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
 #include <signal.h>
 #include <time.h>
 #include <stdbool.h>
 #include <mosquitto.h>
+#include <ctype.h>
+
 
 static struct mosquitto *mosquitto_client = NULL;
 
@@ -16,10 +31,10 @@ static struct mosquitto *mosquitto_client = NULL;
 #define BACKLOG 1 // Number of connections allowed (1 currently)
 #define BUFFER_SIZE 256
 #define COMMAND_BUFFER_SIZE 128
-#define SENDMSG(x) mqttClient.publish("game/message/serverToClient", x)
+#define SENDMSG(x) mosquitto_publish(mosquitto_client, NULL, "game/message/serverToClient",(int)strlen(x), x, 0, false)
 
 static void cleanup_input(char *input) {
-    char *stripped = input + strlen(s);
+    char *stripped = input + strlen(input);
 
     while (stripped > input && (*(stripped - 1) =='\n' || *(stripped - 1)=='\r')) {
         *--stripped = '\0';
@@ -40,13 +55,13 @@ int setup_listener(int port) {
 
     int reuse_address = 1;
 
-    if (setsockopt(listen_descriptor, SOL_SOCKET, SO_REUSEADDR, &reuse_address, sizeof(reuse_address)) < 0) {
+    if (setsockopt(listen_descriptor, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuse_address, sizeof(reuse_address)) < 0) {
         perror("setsocketopt");
         close(listen_descriptor);
         exit(1);
     }
 
-    struct socketaddress_in server_address;
+    struct sockaddr_in server_address;
     memset(&server_address, 0, sizeof(server_address));
     server_address.sin_family = AF_INET; // IPv4
     server_address.sin_addr.s_addr = INADDR_ANY; // Local IP
@@ -54,7 +69,7 @@ int setup_listener(int port) {
 
     // Bind the socket to the specified port
     if (bind(listen_descriptor,
-             (struct socketaddress*)&server_address,
+             (struct sockaddr*)&server_address,
              sizeof(server_address)) < 0)
     {
         perror("bind");
@@ -70,7 +85,7 @@ int setup_listener(int port) {
     }
 
     printf("Server listening on TCP port %d\n", port);
-    return 
+    return listen_descriptor;
 }
 
 // Room structure definition
@@ -136,7 +151,7 @@ int findRoomByCoords(int x, int y)
 // MQTT payload should be handled and printed on the clientside after receiving.
 void printRoomDescription(int roomId)
 {
-    char *description = dungeons[currentDungeon][roomID].description;
+    char *description = dungeons[currentDungeon][roomId].description;
     printf("\n%s\n", description);
     printf("Current Dungeon: %d\n", currentDungeon);
 
@@ -178,7 +193,7 @@ int movePlayer(char direction)
         break;
     default:
         printf("Player tried to move in invalid direction.\n");
-        SENDMSG("Invalid direction! Use N, S, E, or W.")
+        SENDMSG("Invalid direction! Use N, S, E, or W.");
         return 0;
     }
 
@@ -283,6 +298,9 @@ void printDungeon()
 
 // Handles / interprets commands coming from the ESP32. 
 void handle_incoming_command(int client_descriptor) {
+SENDMSG("Welcome to the MUD! Enter N, S, W, or E to move North, South, West, or East respectively..\n> ");
+printRoomDescription(currentRoom);
+
     char buffer[COMMAND_BUFFER_SIZE];
     ssize_t n;
 
@@ -317,11 +335,12 @@ mosquitto_lib_init();
 mosquitto_client = mosquitto_new("dungeon-server", true, NULL);
 
 if (!mosquitto_client) {
-    fprintf(stderr, "Error: No valid pointer\n")
+    fprintf(stderr, "Error: No valid pointer\n");
+    exit(1);
 }
 
-if (mosquitto_connect(mosquitto_client, "localhost, 1883, 60") != MOSQ_ERR_SUCCESS) {
-    fprintf(stdrerr, "Error: Couldn't connect to broker\n");
+if (mosquitto_connect(mosquitto_client, "localhost", 1883, 60) != MOSQ_ERR_SUCCESS) {
+    fprintf(stderr, "Error: Couldn't connect to broker\n");
     exit(1);
 }
 
@@ -334,31 +353,20 @@ if (mosquitto_connect(mosquitto_client, "localhost, 1883, 60") != MOSQ_ERR_SUCCE
     // Start in a random room
     currentRoom = rand() % 10;
 
-    SENDMSG("Welcome to the Dungeon!\n");
-    SENDMSG("Type 'H' for help, 'Q' to quit.\n");
-    printRoomDescription(currentRoom);
 
-    while (1)
-    {
-        printf("\nEnter command: ");
-        if (fgets(input, sizeof(input), stdin) == NULL)
-            break;
+    int listen_descriptor = setup_listener(TCP_PORT);
 
-        // Remove newline
-        input[strcspn(input, "\n")] = 0;
+    while (1) {
+        struct sockaddr_in client_address;
+        socklen_t addresslength = sizeof(client_address);
+        int client_descriptor = accept(listen_descriptor, (struct sockaddr*)&client_address, &addresslength);
 
-        if (input[0] == 'D' || input[0] == 'd')
-        {
-            printDungeon();
+        if (client_descriptor < 0) {
+            perror("accept");
+            continue;
         }
-        else if (strlen(input) == 1)
-        {
-            movePlayer(input[0]);
-        }
-        else
-        {
-            printf("Invalid command!");
-        }
+
+        handle_incoming_command(client_descriptor);
     }
 
     mosquitto_loop_stop(mosquitto_client, true);
