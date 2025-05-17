@@ -32,6 +32,7 @@ static struct mosquitto *mosquitto_client = NULL;
 #define BUFFER_SIZE 256
 #define COMMAND_BUFFER_SIZE 128
 #define SENDMSG(x) mosquitto_publish(mosquitto_client, NULL, "game/message/serverToClient",(int)strlen(x), x, 0, false)
+#define GRID_SIZE 4
 
 static void cleanup_input(char *input) {
     char *stripped = input + strlen(input);
@@ -267,46 +268,42 @@ int movePlayer(char direction)
 
 void printDungeon()
 {
-    printf("\nDungeon Layout (Dungeon %d):\n", currentDungeon);
-    printf("   0   1   2   3\n");
-    printf("  +---+---+---+---+\n");
+    uint8_t grid[GRID_SIZE*GRID_SIZE];
+    int idx = 0;
 
-    for (int y = 3; y >= 0; y--)
+    for(int y = GRID_SIZE-1; y >= 0; --y)
     {
-        printf("%d |", y);
-        for (int x = 0; x < 4; x++)
+        for(int x = 0; x < GRID_SIZE; ++x)
         {
-            int room = findRoomByCoords(x, y);
-            if (room != -1)
-            {
-                if (room == currentRoom)
-                {
-                    printf(" * |"); // Current room
+            int room = findRoomByCoords(x,y);
+            uint8_t code = 0;
+            if (room != -1) {
+                if (room == currentRoom) {
+                    code = 1;
                 }
-                else if (dungeons[currentDungeon][room].isStartRoom)
-                {
-                    printf(" S |"); // Start room
+                else if (dungeons[currentDungeon][room].isStartRoom) {
+                    code = 2;
                 }
-                else if (dungeons[currentDungeon][room].isConnectorRoom)
-                {
-                    printf(" C |"); // Connector room
+                else if (dungeons[currentDungeon][room].isConnectorRoom) {
+                    code = 3;
                 }
-                else if (dungeons[currentDungeon][room].isItemRoom)
-                {
-                    printf(" I |"); // Item room
+                else if (dungeons[currentDungeon][room].isItemRoom) {
+                    code = 4;
                 }
-                else
-                {
-                    printf(" R |"); // Regular room
+                else{
+                    code = 5;
                 }
             }
-            else
-            {
-                printf("   |"); // Empty space
-            }
+            grid[idx++] = code;
         }
-        printf("\n  +---+---+---+---+\n");
     }
+
+    mosquitto_publish(
+        mosquitto_client, NULL,
+        "game/dungeon/grid",
+        sizeof(grid), (const void*)grid,
+        0, false
+    );
 }
 
 // Handles / interprets commands coming from the ESP32. 
@@ -324,13 +321,13 @@ printRoomDescription(currentRoom);
         if (strcmp(buffer, "N") == 0 || strcmp(buffer, "S") == 0 || strcmp(buffer, "E") == 0 || strcmp(buffer, "W") == 0) {
             char direction;
 
-            if (strcmp(buffer, "S")== 0) {
+            if (strcmp(buffer, "N")== 0) {
                 direction = 'n';
             }
-            else if (strcmp(buffer, "E")== 0) {
+            else if (strcmp(buffer, "S")== 0) {
                 direction = 's';
             } 
-            else if (strcmp(buffer, "W" )== 0) {
+            else if (strcmp(buffer, "E" )== 0) {
                 direction = 'e';
             }
             else {
@@ -338,6 +335,10 @@ printRoomDescription(currentRoom);
             }
 
             movePlayer(direction);
+        }
+
+        if (strcmp(buffer, "D") == 0) {
+            printDungeon();
         }
     }
 }

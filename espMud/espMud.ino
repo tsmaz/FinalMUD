@@ -3,6 +3,8 @@
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
 
+#define GRID_SIZE 4
+
 // Wi-Fi and MQTT configuration - CHANGE THESE
 const char* ssid = "Airplow";
 const char* password = "tonytony";
@@ -23,11 +25,12 @@ void scrollText(String text) {
   for (int i = 0; i < text.length() - 15; i++) {
     lcd.setCursor(0, 0);
     lcd.print(text.substring(i, i + 16));
-    delay(400);  // Scroll speed
+    delay(200);  // Scroll speed
   }
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
+  // Handle receiving and printing room descriptions
   if (strcmp(topic, "game/room/description") == 0) {
     String description = "";
     for (unsigned int i = 0; i < length; i++) {
@@ -35,13 +38,45 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
     scrollText(description);
   }
-
-  if (strcmp(topic, "game/message/serverToClient") == 0) {
+  // Handle general server-to-client messages
+  else if (strcmp(topic, "game/message/serverToClient") == 0) {
      String message = "";
     for (unsigned int i = 0; i < length; i++) {
       message += (char)payload[i];
     }
     scrollText(message);
+  }
+  // Handle receiving and printing grid
+  else if (strcmp(topic, "game/dungeon/grid") == 0 && length == GRID_SIZE*GRID_SIZE) {
+    uint8_t grid[GRID_SIZE][GRID_SIZE];
+    for (unsigned int i = 0; i < length; ++i) {
+      int row = i / GRID_SIZE;
+      int col = i % GRID_SIZE;
+
+      grid[row][col] = payload[i];
+    }
+
+    Serial.println("  0 1 2 3");
+    Serial.println(" +--------+");
+    for (int r = 0; r < GRID_SIZE; ++r) {
+      Serial.print(r);
+      Serial.print("|");
+      for (int c = 0; c < GRID_SIZE; ++c) {
+        char symbol;
+        switch (grid[r][c]) {
+          case 1: symbol = '*'; break;  // current
+          case 2: symbol = 'S'; break;  // start
+          case 3: symbol = 'C'; break;  // connector
+          case 4: symbol = 'I'; break;  // item
+          case 5: symbol = 'R'; break;  // room
+          default: symbol = ' ';        // empty
+        }
+        Serial.print(symbol);
+        Serial.print(' ');
+      }
+      Serial.println("|");
+    }
+    Serial.println(" +--------+");
   }
 }
 
@@ -56,6 +91,8 @@ void reconnect() {
     if (client.connect(clientId.c_str())) {
       Serial.println("MQTT connected.");
       client.subscribe("game/room/description");
+      client.subscribe("game/dungeon/grid");  
+      client.subscribe("game/message/serverToClient");
     } else {
       Serial.print("Failed, rc=");
       Serial.print(client.state());
@@ -84,15 +121,15 @@ void setup() {
   client.setServer(host_ip, 1883);
   client.setCallback(callback);
 
-  sock.connect(host_ip, 4000);
-
   Wire.begin(14, 13); // Adjust pins if necessary
   lcd.init();
   lcd.backlight();
   lcd.setCursor(0, 0);
   lcd.print("MUD Ready");
-  delay(2000);
+  delay(5000);
   lcd.clear();
+  reconnect();
+  sock.connect(host_ip, 4000);
 }
 
 void loop() {
@@ -104,9 +141,13 @@ void loop() {
   if (Serial.available() > 0) {
     char input = Serial.read();
     input = tolower(input);
-    if (input == 'n' || input == 'e' || input == 's' || input == 'w') {
+    if (input == 'n' || input == 'e' || input == 's' || input == 'w' || input == 'd') {
       Serial.printf("Sending move: %c\n", input);
       sendMove(input);
+    }
+    else if (input == 't') {
+      Serial.printf("Testing LCD.");
+      scrollText("Hello World!");
     }
   }
 }
