@@ -127,15 +127,15 @@ Room dungeon3[10] = {
 
 // Fourth dungeon
 Room dungeon4[10] = {
-    {0, 0, 1, "You are at coordinates (0,1)", false, true, true, 0}, // Start Room (near bottom left)
-    {1, 1, 1, "You are at coordinates (1,1)", false, false, false, -1},
-    {2, 1, 0, "You are at coordinates (1,0)", false, false, false, -1},
-    {3, 2, 0, "You are at coordinates (2,0)", false, false, false, -1},
-    {4, 1, 2, "You are at coordinates (3,0)", false, false, false, 2},
-    {5, 2, 2, "You are at coordinates (2,2)", false, false, false, -1},
-    {6, 3, 2, "You are at coordinates (0,1)", false, false, false, -1},
-    {7, 3, 3, "You are at coordinates (1,1)", false, true, false, -1}, // Connector room (top right)
-    {8, 3, 1, "You are at coordinates (2,1)", false, false, false, -1},
+    {0, 0, 1, "You are in a room that is filled on almost all sides with chairs. The only way out is a room to the East.", false, true, true, 0}, // Start Room (near bottom left)
+    {1, 1, 1, "You are now at a split choice in a corridor made of metal. You can either move West to the room of chairs, move North through a door, or move South.", false, false, false, -1},
+    {2, 1, 0, "You are now in the south corner of the metal corridor. You can either move up North or move East to investigate the nearby room.", false, false, false, -1},
+    {3, 2, 0, "You are in a dark room. It's impossible to make anything out, so there's nowhere to go, except the door to the West.", false, false, false, -1},
+    {4, 1, 2, "You are in a room made entirely made of candy. Despite the temptations, you must choose to either move South to the metal corridor or move East through a door.", false, false, false, 2},
+    {5, 2, 2, "You are in a room that's made of creaky wood. The way East seems a bit unstable, but you could probably jump through the doorway. You could also choose to move to the West, which you can tell is safe.", false, false, false, -1},
+    {6, 3, 2, "You are in a room made of soft bedding. You can move through the gold door North of you, or investigate the heat in the room to the South.", false, false, false, -1},
+    {7, 3, 3, "You are in a room that appears to be made of gold... but it turns out to be a trick. The yellow-painted floor gives way, and you fall for a long time. Everything goes dark. When you regain consciousness...", false, true, false, -1}, // Connector room (top right)
+    {8, 3, 1, "You are in a room that's on fire. You can either brave the flames and move to the east, or flee to the chill of the North.", false, false, false, -1},
     {9, 4, 1, "You are at coordinates (3,1)", true, false, false, -1}}; //Item room (near bottom right)
 
 // Array of dungeon pointers for easy access
