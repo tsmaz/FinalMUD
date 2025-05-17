@@ -24,7 +24,7 @@
 
 static struct mosquitto *mosquitto_client = NULL;
 
-#define GRID_SIZE 4
+#define GRID_SIZE 6
 #define NUM_ROOMS 10
 #define NUM_DUNGEONS 4 // Number of dungeons
 #define TCP_PORT 4000
