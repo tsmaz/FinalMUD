@@ -136,7 +136,7 @@ Room dungeon4[10] = {
     {6, 3, 2, "You are in a room made of soft bedding. You can move through the gold door North of you, or investigate the heat in the room to the South.", false, false, false, -1},
     {7, 3, 3, "You are in a room that appears to be made of gold... but it turns out to be a trick. The yellow-painted floor gives way, and you fall for a long time. Everything goes dark. When you regain consciousness...", false, true, false, -1}, // Connector room (top right)
     {8, 3, 1, "You are in a room that's on fire. You can either brave the flames and move to the east, or flee to the chill of the North.", false, false, false, -1},
-    {9, 4, 1, "You are at coordinates (3,1)", true, false, false, -1}}; //Item room (near bottom right)
+    {9, 4, 1, "You are in a room made entirely of gold. There's a treasure chest at the end of the room. You look inside... Inside is a small golden chair. Maybe it's valuable...? THE END.", true, false, false, -1}}; //Item room (near bottom right)
 
 // Array of dungeon pointers for easy access
 Room *dungeons[NUM_DUNGEONS] = {dungeon1, dungeon2, dungeon3, dungeon4};
