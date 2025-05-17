@@ -28,6 +28,32 @@ int setup_listener(int port) {
         close(listen_descriptor);
         exit(1);
     }
+
+    struct socketaddress_in server_address;
+    memset(&server_address, 0, sizeof(server_address));
+    server_address.sin_family = AF_INET; // IPv4
+    server_address.sin_addr.s_addr = INADDR_ANY; // Local IP
+    server_address.sin_port = htons(port); 
+
+    // Bind the socket to the specified port
+    if (bind(listen_descriptor,
+             (struct socketaddress*)&server_address,
+             sizeof(server_address)) < 0)
+    {
+        perror("bind");
+        close(listen_descriptor);
+        exit(1);
+    }
+
+        // Start listening, with a backlog for pending connections
+    if (listen(listen_descriptor, BACKLOG) < 0) {
+        perror("listen");
+        close(listen_descriptor);
+        exit(1);
+    }
+
+    printf("Server listening on TCP port %d\n", port);
+    return 
 }
 
 // Room structure definition
