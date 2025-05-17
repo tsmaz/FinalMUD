@@ -5,6 +5,9 @@
 #include <signal.h>
 #include <time.h>
 #include <stdbool.h>
+#include <mosquitto.h>
+
+static struct mosquitto *mosquitto_client = NULL;
 
 #define GRID_SIZE 4
 #define NUM_ROOMS 10
@@ -257,6 +260,19 @@ void printDungeon()
 
 int main()
 {
+mosquitto_lib_init();
+mosquitto_client = mosquitto_new("dungeon-server", true, NULL);
+
+if (!mosquitto_client) {
+    fprintf(stderr, "Error: No valid pointer\n")
+}
+
+if (mosquitto_connect(mosquitto_client, "localhost, 1883, 60") != MOSQ_ERR_SUCCESS) {
+    fprintf(stdrerr, "Error: Couldn't connect to broker\n");
+    exit(1);
+}
+
+
     char input[10];
 
     // Initialize random seed
@@ -292,5 +308,11 @@ int main()
         }
     }
 
+    mosquitto_loop_stop(mosquitto_client, true);
+    mosquitto_disconnect(mosquitto_client);
+    mosquitto_destroy(mosquitto_client);
+    mosquitto_lib_cleanup();
+
     return 0;
+
 }
