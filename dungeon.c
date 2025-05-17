@@ -16,6 +16,7 @@ static struct mosquitto *mosquitto_client = NULL;
 #define BACKLOG 1 // Number of connections allowed (1 currently)
 #define BUFFER_SIZE 256
 #define COMMAND_BUFFER_SIZE 128
+#define SENDMSG(x) mqttClient.publish("game/message/serverToClient", x)
 
 static void cleanup_input(char *input) {
     char *stripped = input + strlen(s);
@@ -150,8 +151,6 @@ void printRoomDescription(int roomId)
     if (ret != MOSQ_ERR_SUCCESS) {
         fprintf(stderr, "Failed to publish message: %s\n", mosquitto_strerror(ret));
     }
-    
-
 }
 
 int movePlayer(char direction)
@@ -178,7 +177,8 @@ int movePlayer(char direction)
         newX--;
         break;
     default:
-        printf("Invalid direction! Use N, S, E, or W.\n");
+        printf("Player tried to move in invalid direction.\n");
+        SENDMSG("Invalid direction! Use N, S, E, or W.")
         return 0;
     }
 
@@ -277,6 +277,36 @@ void printDungeon()
             }
         }
         printf("\n  +---+---+---+---+\n");
+    }
+}
+
+// Handles / interprets commands coming from the ESP32. 
+void handle_incoming_command(int client_descriptor) {
+    char buffer[COMMAND_BUFFER_SIZE];
+    ssize_t n;
+
+    while ((n = read(client_descriptor, buffer, sizeof(buffer) - 1)) > 0) {
+        buffer[n] = '\0';
+        cleanup_input(buffer);
+
+        if (strcmp(buffer, "N") == 0 || strcmp(buffer, "S") == 0 || strcmp(buffer, "E") == 0 || strcmp(buffer, "W") == 0) {
+            char direction;
+
+            if (strcmp(buffer, "NORTH")==0) {
+                direction = 'n';
+            }
+            else if (strcmp(buffer, "SOUTH")==0) {
+                direction = 's';
+            } 
+            else if (strcmp(buffer, "EAST" )==0) {
+                direction = 'e';
+            }
+            else {
+                direction = 'w';
+            }
+
+            movePlayer(direction);
+        }
     }
 }
 
